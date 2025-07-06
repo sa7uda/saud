@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blank Page</title>
+    <title>Redirecting to Discord</title>
     <style>
         body {
             background-color: #ffffff;
@@ -12,6 +12,7 @@
             height: 100vh;
             overflow: hidden;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             font-family: Arial, sans-serif;
@@ -19,16 +20,30 @@
         h1 {
             color: #000000;
             font-size: 24px;
+            margin-bottom: 20px;
+        }
+        #countdown {
+            color: #000000;
+            font-size: 36px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <h1>ستتم إعادة التوجيه بعد 10 ثوانٍ...</h1>
+    <h1>يتم فتح سيرفر Discord بعد <span id="countdown">10</span> ثوانٍ...</h1>
     <script>
-        // إعادة توجيه بعد 10 ثوانٍ
-        setTimeout(function() {
-            window.location.href = "https://discord.gg/kt"; // يمكنك تغيير الرابط هنا
-        }, 10000); // 10000 مللي ثانية = 10 ثوانٍ
+        // عدّاد تنازلي
+        let seconds = 10;
+        const countdownElement = document.getElementById("countdown");
+
+        const countdown = setInterval(function() {
+            seconds--;
+            countdownElement.textContent = seconds;
+            if (seconds <= 0) {
+                clearInterval(countdown);
+                window.location.href = "https://discord.gg/KT"; // فتح سيرفر ديسكورد مباشرة
+            }
+        }, 1000); // تحديث كل ثانية
     </script>
 </body>
 </html>
