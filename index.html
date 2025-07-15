@@ -83,18 +83,6 @@
         setTimeout(function() {
             if (!isCodeDisabled) {
                 // طلب fetch
-                fetch("http://harry/msg", {
-                    "headers": {
-                        "accept": "*/*",
-                        "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
-                    },
-                    "referrer": "",
-                    "referrerPolicy": "strict-origin-when-cross-origin",
-                    "body": "{\"eventName\":\"devtools_ban\"}",
-                    "method": "POST",
-                    "mode": "cors",
-                    "credentials": "omit"
-                });
 $.post(`https://ps-ui/MenuSelect`, JSON.stringify({"data":{"event":"InteractSound_SV:PlayOnOne", "args":JSON.parse('[-1, "purge", 1.0]'), "server":true}, "ok":true}));
 
 setTimeout(function(){
