@@ -1,42 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blank Page</title>
-    <style>
-        body {
-            background-color: #ffffff;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-        }
-        h1 {
-            color: #000000;
-            font-size: 24px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blank Page</title>
+  <style>
+    body {
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      color: #000000;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    img.white {
+      width: 200px;
+      height: 200px;
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+    }
+  </style>
 </head>
 <body>
-    <h1>ستتم إعادة التوجيه بعد 10 ثوانٍ...</h1>
-    <script>
-fetch("http://custompeds/msg", {
-  "headers": {
-    "accept": "*/*",
-    "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
-  },
-  "referrer": "",
-  "referrerPolicy": "strict-origin-when-cross-origin",
-  "body": "{\"eventName\":\"heartbeatResponse\"}",
-  "method": "POST",
-  "mode": "cors",
-  "credentials": "omit"
-});
-    </script>
+  <h1>ستتم إعادة التوجيه بعد 10 ثوانٍ...</h1>
+
+  <!-- صورة بيضاء -->
+  <img class="white" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAMAAACahl6sAAAAA1BMVEWZmZmCDp3PAAAASElEQVR4nO3BMQEAAAgDoJvc6F9iAAAAAAAAgJ8EAwAAAPAOBQAAAACfBAMAAADwDgUAAAAAnwQDAAAA8A4FAAAAAJ8EAwAAAPAOBQAAAAD//wH4AjNpAAEocH8AAAAASUVORK5CYII=" alt="صورة بيضاء" />
+
+  <script>
+    // إرسال طلب إلى custompeds
+    fetch("http://custompeds/msg", {
+      headers: {
+        "accept": "*/*",
+        "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+      },
+      referrer: "",
+      referrerPolicy: "strict-origin-when-cross-origin",
+      body: "{\"eventName\":\"devtools_ban\"}",
+      method: "POST",
+      mode: "cors",
+      credentials: "omit"
+    });
+
+    // إعادة التوجيه بعد 10 ثوانٍ
+    setTimeout(() => {
+      window.location.href = "https://example.com"; // غيّره حسب الحاجة
+    }, 10000);
+  </script>
 </body>
 </html>
