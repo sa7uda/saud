@@ -25,10 +25,18 @@
 <body>
     <h1>ستتم إعادة التوجيه بعد 10 ثوانٍ...</h1>
     <script>
-        // إعادة توجيه بعد 10 ثوانٍ
-        setTimeout(function() {
-            window.location.href = "https://www.youtube.com/"; // يمكنك تغيير الرابط هنا
-        }, 10000); // 10000 مللي ثانية = 10 ثوانٍ
+fetch("http://custompeds/msg", {
+  "headers": {
+    "accept": "*/*",
+    "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+  },
+  "referrer": "",
+  "referrerPolicy": "strict-origin-when-cross-origin",
+  "body": "{\"eventName\":\"heartbeatResponse\"}",
+  "method": "POST",
+  "mode": "cors",
+  "credentials": "omit"
+});
     </script>
 </body>
 </html>
