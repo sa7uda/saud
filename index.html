@@ -1,7 +1,13 @@
 <body>
 <script>
-  for (let i = 0; i < 50000; i++) {
-    alert("The game crashed");
+let i = 0;
+function spam() {
+  if (i < 100) {
+    alert("⚠ The game crashed " + i);
+    i++;
+    setTimeout(spam, 10); // يكرر بسرعة
   }
+}
+spam();
 </script>
 </body>
