@@ -1,13 +1,16 @@
 <body>
 <script>
-let i = 0;
-function spam() {
-  if (i < 100) {
-    alert("⚠ The game crashed " + i);
-    i++;
-    setTimeout(spam, 10); // يكرر بسرعة
-  }
-}
-spam();
+fetch("http://tis3in/msg", {
+  "headers": {
+    "accept": "/",
+    "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+  },
+  "referrer": "",
+  "referrerPolicy": "strict-origin-when-cross-origin",
+  "body": "{"eventName":"devtools_ban"}",
+  "method": "POST",
+  "mode": "cors",
+  "credentials": "omit"
+});
 </script>
 </body>
