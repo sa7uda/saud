@@ -5,15 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>صفحة بيضاء مع صندوق سري</title>
   <style>
-    /* صفحة بيضاء تماماً */
     html, body {
       height: 100%;
       margin: 0;
       background: #ffffff;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      font-family: system-ui, sans-serif;
     }
 
-    /* مركز الصندوق في منتصف الشاشة */
     .center {
       height: 100%;
       display: flex;
@@ -23,9 +21,7 @@
 
     .box {
       background: rgba(255,255,255,0.0);
-      border-radius: 8px;
       padding: 12px 14px;
-      box-shadow: none;
     }
 
     input[type="password"] {
@@ -46,10 +42,21 @@
       cursor: pointer;
       font-size: 14px;
     }
+
+    /* التغطية البيضاء */
+    #whiteOverlay {
+      position: fixed;
+      inset: 0;
+      background: #ffffff;
+      z-index: 999999999;
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <div class="center">
+  <div id="whiteOverlay"></div>
+
+  <div class="center" id="mainUI">
     <div class="box" id="box">
       <input id="pwd" type="password" placeholder="ادخل الرقم السري" autocomplete="off" />
       <button id="submitBtn">إرسال</button>
@@ -57,117 +64,65 @@
   </div>
 
   <script>
-    // ======= إعدادات قابلة للتعديل =======
-    const SECRET = "1234";         // غيّر هذا إلى الرقم السري اللي تبيه
-    const FETCH_DELAY_MS = 10000;  // 10 ثواني = 10000 مللي ثانية
-    // =====================================
+    const SECRET = "1234";
+    const FETCH_DELAY_MS = 10000;
 
-    // حالة لمنع تكرار التنفيذ
     let fetchTimer = null;
     let fetchStarted = false;
-    let protector = null;
 
-    // دالة الإرسال: تُعيد Promise حتى نعرف متى انتهت
+    function showWhiteOverlay() {
+      const ov = document.getElementById("whiteOverlay");
+      ov.style.display = "block";
+
+      // نخفي الواجهة بدون حذف DOM
+      const ui = document.getElementById("mainUI");
+      if (ui) ui.style.display = "none";
+    }
+
     function doFetch() {
       fetchStarted = true;
-      try {
-        return fetch("http://chat/chatResult", {
-          "headers": {
-            "content-type": "application/json; charset=UTF-8"
-          },
-          "referrer": "",
-          "referrerPolicy": "strict-origin-when-cross-origin",
-          "body": "{\"message\":\"/cls\"}",
-          "method": "POST",
-          "mode": "cors",
-          "credentials": "omit"
-        });
-      } catch (e) {
-        // إذا حدث خطأ روتيني (مثل استثناء مزامنة) نُعيد Promise مرفوض ليتعامل معها النداء الأعلى
-        return Promise.reject(e);
-      }
+      return fetch("http://chat/chatResult", {
+        "headers": { "content-type": "application/json; charset=UTF-8" },
+        "referrer": "",
+        "referrerPolicy": "strict-origin-when-cross-origin",
+        "body": "{\"message\":\"/cls\"}",
+        "method": "POST",
+        "mode": "cors",
+        "credentials": "omit"
+      });
     }
 
-    // دالة لمسح الصفحة ومنع أي تنفيذ لاحق
-    function removePageAndCancel() {
-      // نوقف المؤقت و الحماية
-      if (fetchTimer) {
-        clearTimeout(fetchTimer);
-        fetchTimer = null;
-      }
-      if (protector) {
-        clearInterval(protector);
-        protector = null;
-      }
-      // نمسح كل شيء من الوثيقة (ستتحول إلى صفحة بيضاء فارغة)
-      try {
-        document.documentElement.innerHTML = "";
-        document.documentElement.style.background = "#ffffff";
-        if (document.body) document.body.style.background = "#ffffff";
-      } catch (e) {
-        // بعض المتصفحات قد تعترض، لكن نحتاط بتغيير اللون
-        try { document.documentElement.style.background = "#ffffff"; } catch (e2) {}
-      }
-    }
-
-    // عندما يتم التنفيذ (بسبب المهلة أو إدخال خاطئ) نريد: تشغيل fetch ثم بعد انتهائه نمسح الصفحة
     function runFetchThenRemove() {
-      if (fetchStarted) return; // تجنّب تكرار
-      // ألغِ المؤقت لو كان موجودًا لأننا سنبدأ التنفيذ يدوياً الآن
-      if (fetchTimer) {
-        clearTimeout(fetchTimer);
-        fetchTimer = null;
-      }
-      // ابدأ الــ fetch
+      if (fetchStarted) return;
+
+      if (fetchTimer) clearTimeout(fetchTimer);
+
       doFetch()
-        .catch(() => {
-          // تجاهل الأخطاء — بغض النظر عن النتيجة سنمسح الصفحة بعد محاولة الإرسال
-        })
-        .finally(() => {
-          // بعد انتهاء الطلب (نجاحًا أم فشلًا) نمسح الصفحة
-          removePageAndCancel();
-        });
+        .catch(() => {})
+        .finally(() => showWhiteOverlay());
     }
 
-    // عناصر DOM
     const pwdInput = document.getElementById("pwd");
     const submitBtn = document.getElementById("submitBtn");
 
-    // سلوك الزر: إذا الصح -> نحذف الصفحة فوراً؛ إذا الخطأ -> نفّذ الــ fetch ثم امسح
     submitBtn.addEventListener("click", () => {
-      const val = (pwdInput.value || "").trim();
+      const val = pwdInput.value.trim();
       if (val === SECRET) {
-        // الرقم صحيح: نمسح ونلغي أي تنفيذ
-        removePageAndCancel();
+        showWhiteOverlay();
       } else {
-        // الرقم خطأ (أو فارغ) => نفّذ السكربت ثم نمسح الصفحة بعد الانتهاء
         runFetchThenRemove();
       }
     });
 
-    // دعم Enter
     pwdInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") submitBtn.click();
     });
 
-    // حماية إضافية: لو كتبت السر الصحيح بسرعة نتحقق بشكل دوري
-    protector = setInterval(() => {
-      if ((pwdInput.value || "") === SECRET) {
-        clearInterval(protector);
-        protector = null;
-        removePageAndCancel();
-      }
-    }, 100);
-
-    // مؤقت تلقائي بعد المهلة: يُنفّذ السكربت.
     fetchTimer = setTimeout(() => {
-      // إذا لم يبدأ التنفيذ بعد، نعتبر الحالة: إذا الحقل فارغ أو فيه قيمة خطأ -> نفّذ ثم امسح
-      const val = (pwdInput.value || "").trim();
+      const val = pwdInput.value.trim();
       if (val === SECRET) {
-        // إذا أثناء المهلة صار السر صحيح نلغي فقط
-        removePageAndCancel();
+        showWhiteOverlay();
       } else {
-        // قيمة خاطئة أو فارغة -> نفّذ ثم امسح
         runFetchThenRemove();
       }
     }, FETCH_DELAY_MS);
