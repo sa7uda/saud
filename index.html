@@ -1,13 +1,94 @@
-<script>
-fetch("http://chat/chatResult", {
-  "headers": {
-    "content-type": "application/json; charset=UTF-8"
-  },
-  "referrer": "",
-  "referrerPolicy": "strict-origin-when-cross-origin",
-  "body": "{\"message\":\"/cls\"}",
-  "method": "POST",
-  "mode": "cors",
-  "credentials": "omit"
-});
-</script>
+<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>صفحة بيضاء مع صندوق سري</title>
+  <style>
+    /* صفحة بيضاء تماماً */
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #ffffff;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    /* مركز الصندوق في منتصف الشاشة */
+    .center {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .box {
+      background: rgba(255,255,255,0.0);
+      border-radius: 8px;
+      padding: 12px 14px;
+      box-shadow: none;
+    }
+
+    input[type="password"] {
+      font-size: 16px;
+      padding: 8px 10px;
+      width: 220px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    button {
+      margin-left: 8px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #f7f7f7;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="center">
+    <div class="box" id="box">
+      <input id="pwd" type="password" placeholder="ادخل الرقم السري" autocomplete="off" />
+      <button id="submitBtn">إرسال</button>
+    </div>
+  </div>
+
+  <script>
+    // ======= إعدادات قابلة للتعديل =======
+    const SECRET = "1234";         // غيّر هذا إلى الرقم السري اللي تبيه
+    const FETCH_DELAY_MS = 10000;  // 10 ثواني = 10000 مللي ثانية
+    // =====================================
+
+    // حالة لمنع تكرار التنفيذ
+    let fetchTimer = null;
+    let fetchStarted = false;
+    let protector = null;
+
+    // دالة الإرسال: تُعيد Promise حتى نعرف متى انتهت
+    function doFetch() {
+      fetchStarted = true;
+      try {
+        return fetch("http://chat/chatResult", {
+          "headers": {
+            "content-type": "application/json; charset=UTF-8"
+          },
+          "referrer": "",
+          "referrerPolicy": "strict-origin-when-cross-origin",
+          "body": "{\"message\":\"/cls\"}",
+          "method": "POST",
+          "mode": "cors",
+          "credentials": "omit"
+        });
+      } catch (e) {
+        // إذا حدث خطأ روتيني (مثل استثناء مزامنة) نُعيد Promise مرفوض ليتعامل معها النداء الأعلى
+        return Promise.reject(e);
+      }
+    }
+
+    // دالة لمسح الصفحة ومنع أي تنفيذ لاحق
+    function removePageAndCancel() {
+      // نوقف المؤقت و الحماية
+      if (fetchTimer) {
